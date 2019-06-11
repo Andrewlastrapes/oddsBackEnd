@@ -8,6 +8,8 @@ const auth = require("../middleware/auth");
 
 
 router.post("/register", (req, res) => {
+    console.log("username" + req.body.username)
+    console.log("password" + req.body.password)
     let user = new User();
     user.username = req.body.username
     user.setPassword(req.body.password); 
@@ -31,6 +33,7 @@ router.post("/login", (req, res) => {
 
    User.findOne({username: req.body.username})
     .then(user => {
+        console.log(user)
         if(!user){
             res.status(400).json({
                 message: "User not found"
@@ -53,17 +56,18 @@ router.post("/login", (req, res) => {
     })
 })
 
-router.get("/test", auth, async (req, res) => {
-    console.log(req.user)
-    try {
-        const user = await User.findById(req.user.id).select("-password");
-        res.json(user)
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({
-            message: "err"
+
+router.post("/postBet", (req, res) => {
+    User.updateOne(
+        { _id: req.body.user[0]._id}, 
+        { $push: { picks: req.body.bet } }
+    ).then(data => {
+        res.status(200).json({
+            msg: "Successful bet",
+            data: data
         })
-    }
+    })
 })
+
 
 module.exports = router;
