@@ -17,7 +17,8 @@ router.post("/register", (req, res) => {
                 })
             } else {
                 let user = new User();
-                user.username = req.body.username
+                user.username = req.body.username;
+                user.money = 0;
                 user.setPassword(req.body.password);
 
                 user.save((err, user) => {
@@ -72,6 +73,28 @@ router.post("/postBet", (req, res) => {
     ).then(data => {
         res.status(200).json({
             msg: "Successful bet",
+            data: data
+        })
+    })
+});
+
+router.get("/getUsers", (req, res) => {
+    User.find({})
+    .then(data => {
+        res.status(200).json({
+            users: data
+        })
+    })
+});
+
+router.post("/addMoney", (req, res) => {
+    User.updateOne(
+        {_id: req.body.user.user._id},
+        {money: req.body.money}
+    )
+    .then(data => {
+        res.status(200).json({
+            msg: "Money Successfully transfered.",
             data: data
         })
     })
