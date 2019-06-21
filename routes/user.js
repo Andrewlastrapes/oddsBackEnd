@@ -67,16 +67,30 @@ router.post("/login", (req, res) => {
 
 
 router.post("/postBet", (req, res) => {
-    User.updateOne(
-        { _id: req.body.user[0]._id },
-        { $push: { picks: req.body.bet } }
-    ).then(data => {
-        res.status(200).json({
-            msg: "Successful bet",
-            data: data
+    let betAmount = req.body.bet["money"]
+    let user;
+
+    User.findById(req.body.user[0]._id)
+    .then(data => {
+       user = data;
+    })
+    .then(() => {
+        user.updateOne(
+            { 
+                $push: { picks: req.body.bet },
+                money: user["money"] - betAmount
+            }
+        )
+        .then(data => {
+            res.status(200).json({
+                msg: "Sucessful bet",
+                data: data,
+                user: user
+            })
         })
     })
 });
+
 
 router.get("/getUsers", (req, res) => {
     User.find({})
